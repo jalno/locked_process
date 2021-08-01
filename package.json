@@ -1,0 +1,6 @@
+{
+    "autoload": {
+        "directories": ["library"]
+    },
+    "dependencies": ["base"]
+}

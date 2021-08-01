@@ -1,0 +1,4 @@
+parameters:
+  level: max
+  scanDirectories:
+    - ../base
