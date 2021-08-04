@@ -22,7 +22,7 @@ class ProcessLock {
 	}
 	
 	public function __destruct() {
-		$log = Log::getIntance();
+		$log = Log::getInstance();
 		if ($this->isLocked()) {
 			$log->debug("Unlocking process");
 			$this->unlock();
