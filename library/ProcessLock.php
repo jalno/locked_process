@@ -20,6 +20,15 @@ class ProcessLock {
 		$this->maxLockTime = $maxLockTime;
 		$this->processArgs($args);
 	}
+	
+	public function __destruct() {
+		$log = Log::getIntance();
+		if ($this->isLocked()) {
+			$log->debug("Unlocking process");
+			$this->unlock();
+			$log->reply("Success");
+		}
+	}
 
 	public function lock(): void {
 		$log = Log::getInstance();
@@ -63,6 +72,10 @@ class ProcessLock {
 	public function isLocked(): bool {
 		$lock = $this->getLock();
 		return ($lock and $lock->isValid());
+	}
+
+	public function unlock(): void {
+		Cache::delete("packgaes.locked_process.lock." . $this->getLockName());
 	}
 
 	public function getLockName(): string {
