@@ -66,7 +66,7 @@ class ProcessLock {
 
 
 	public function getLock(): ?Lock {
-		return Cache::get("packgaes.locked_process.lock." . $this->getLockName());
+		return Cache::get("packgaes.locked_process.lock." . $this->getLockName()) ?: null;
 	}
 
 	public function isLocked(): bool {
