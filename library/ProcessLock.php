@@ -66,7 +66,9 @@ class ProcessLock {
 
 
 	public function getLock(): ?Lock {
-		return Cache::get("packgaes.locked_process.lock." . $this->getLockName()) ?: null;
+		/** @var Lock|null $cachedLock */
+		$cachedLock = Cache::get("packgaes.locked_process.lock." . $this->getLockName());
+		return $cachedLock ?: null;
 	}
 
 	public function isLocked(): bool {
@@ -87,11 +89,10 @@ class ProcessLock {
 	}
 
 	/**
-	 * @param array[] $traceback
+	 * @param array<int,array{class?:class-string,function?:string,type?:'->'|'::'}> $traceback
 	 */
 	protected function findLockName(array $traceback): string {
 		foreach ($traceback as $call) {
-			/** @var array{"file":string,"line":int,"function"?:string,"class"?:string,"type"?:string} $call */
 			if (isset($call['class'], $call['function'], $call['type']) and is_a($call['class'], Process::class, true)) {
 				return $call['class'] . $call['type'] . $call['function'];
 			}
