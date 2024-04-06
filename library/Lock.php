@@ -3,7 +3,10 @@ namespace packages\locked_process;
 
 use packages\base\Date;
 
-class Lock implements \JsonSerializable, \Serializable {
+/**
+ * @phpstan-type LockSerialization array{pid?:int,startTime?:int,endTime?:int,lockIfAlive?:bool}
+ */
+class Lock implements \JsonSerializable {
 	public ?int $pid = null;
 	public ?int $startTime = null;
 	public ?int $endTime = null;
@@ -20,7 +23,10 @@ class Lock implements \JsonSerializable, \Serializable {
 		return $this->endTime === null or $this->endTime > Date::time();
 	}
 
-	public function jsonSerialize() {
+	/**
+	 * @return LockSerialization
+	 */
+	public function jsonSerialize(): array {
 		$data = [];
 		foreach (['pid', 'startTime', 'endTime', 'lockIfAlive'] as $key) {
 			if ($this->{$key} !== null) {
@@ -30,16 +36,28 @@ class Lock implements \JsonSerializable, \Serializable {
 		return $data;
 	}
 
-	public function serialize() {
-		return serialize($this->jsonSerialize());
+	/**
+	 * @return LockSerialization
+	 */
+	public function __serialize(): array {
+		return $this->jsonSerialize();
 	}
 
-	public function unserialize($serialized) {
-		$data = unserialize($serialized);
-		foreach (['pid', 'startTime', 'endTime', 'lockIfAlive'] as $key) {
-			if (isset($data[$key])) {
-				$this->{$key} = $data[$key];
-			}
+	/**
+	 * @param LockSerialization $data
+	 */
+	public function __unserialize(array $data): void {
+		if (isset($data['pid'])) {
+			$this->pid = $data['pid'];
+		}
+		if (isset($data['startTime'])) {
+			$this->startTime = $data['startTime'];
+		}
+		if (isset($data['endTime'])) {
+			$this->endTime = $data['endTime'];
+		}
+		if (isset($data['lockIfAlive'])) {
+			$this->lockIfAlive = $data['lockIfAlive'];
 		}
 	}
 }
